@@ -11,6 +11,7 @@ function App() {
 
   const [ token, setToken] = useState("")
   const [searchKey, setSearchKey] = useState("")
+  const [artists, setArtists] = useState([])
 
   useEffect(() =>{
     const hash = window.location.hash
@@ -31,8 +32,9 @@ function App() {
     window.localStorage.removeItem("token")
   }
 
-  const searchArtists = (e) => {
-    const {data} = axios.get("https://api.spotify.com/v1/search", {
+  const searchArtists = async (e) => {
+    e.preventDefault()
+    const {data} = await axios.get("https://api.spotify.com/v1/search", {
       headers: {
         Authorization: `Bearer ${token}`
       },
@@ -40,10 +42,21 @@ function App() {
         q: searchKey,
         type: "artist"
       }
+      
     })
-
-    console.log(data);
+  
+    setArtists(data.artists.items)
   }
+
+
+    const renderArtists = () => {
+      return artists.map(artist => (
+        <div key={artist.id}>
+          {artist.images.length ? <img width={"100%"} src={artist.images[0].url} alt="" /> : <div>No Image</div>}
+          {artist.name}
+        </div>
+      ))
+    }
 
   return (
     <div className= "App">
@@ -57,12 +70,14 @@ function App() {
          {token ?
          <form onSubmit={searchArtists}>
           <input type="text" onChange={e => setSearchKey(e.target.value)} />
-          <button>Search</button>
+          <button type={"submit"}>Search</button>
          </form>
 
          : <h2>Please login</h2>
          }
 
+        {renderArtists()}
+        
     </div>
   </div>
   );
