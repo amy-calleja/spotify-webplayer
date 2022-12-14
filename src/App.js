@@ -13,6 +13,7 @@ function App() {
   const [ token, setToken] = useState("")
   const [searchKey, setSearchKey] = useState("")
   const [artists, setArtists] = useState([])
+  const [albums, setAlbums] = useState([])
 
   useEffect(() =>{
     const hash = window.location.hash
@@ -50,6 +51,32 @@ function App() {
   }
 
 
+  const searchAlbums = async (e) => {
+    e.preventDefault()
+    const {data} = await axios.get("https://api.spotify.com/v1/search", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }, 
+      params: {
+        q: searchKey,
+        type: "album,track"
+      }
+    })
+
+    setAlbums(data.albums.items)
+    console.log(data.albums.items)
+  }
+
+  const renderAlbums = () => {
+    return albums.map(album => (
+      <div key={albums.id}>
+        {album.images.length? <img width={"100%"} src={album.images[0].url} alt=""/> : <div>No Image</div>}
+        <a href= {album.uri}>{album.name}</a>
+      </div>
+    ))
+  }
+
+
     const renderArtists = () => {
       return artists.map(artist => (
         <div key={artist.id}>
@@ -72,15 +99,22 @@ function App() {
          {token ?
         <>
           <form onSubmit={searchArtists}>
+            <span>Search Artists: </span>
             <input type="text" onChange={e => setSearchKey(e.target.value)} />
-            <button type={"submit"}>Search</button>
+            <button type={"submit"}>GO</button>
+          </form>
+
+          <form onSubmit={searchAlbums}>
+            <span>Search Albums: </span>
+            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+            <button type={"submit"}>GO</button>
           </form>
           <WebPlayback token={token} />
          </>
          : <h2>Please login</h2>
          }
         
-        
+        {renderAlbums()}
         
         {renderArtists()}
         
