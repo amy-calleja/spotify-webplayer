@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
+import WebPlayback from './WebPlayback';
 
 function App() {
 
@@ -61,21 +62,26 @@ function App() {
   return (
     <div className= "App">
       <div className="App-header">
-        <h1>Spotify App</h1>
-
+        
         {!token ? 
         <a href= {`${AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
          : <button onClick={logout}>Logout</button>}
 
-         {token ?
-         <form onSubmit={searchArtists}>
-          <input type="text" onChange={e => setSearchKey(e.target.value)} />
-          <button type={"submit"}>Search</button>
-         </form>
+      <h1>Spotify App</h1>
 
+         {token ?
+        <>
+          <form onSubmit={searchArtists}>
+            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+            <button type={"submit"}>Search</button>
+          </form>
+          <WebPlayback token={token} />
+         </>
          : <h2>Please login</h2>
          }
-
+        
+        
+        
         {renderArtists()}
         
     </div>
