@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 const track = {
     name: "",
     album: {
+        uri:"",
         images: [
             { url: "" }
         ]
@@ -34,7 +35,8 @@ export default function WebPlayback(props) {
             const player = window.Spotify.Player({
                 name: 'Web Playback SDK',
                 getOAuthToken: cb => { cb(props.token); },
-                volume: 0.5
+                volume: 0.5,
+                
             });
     
             setPlayer(player);
@@ -48,8 +50,10 @@ export default function WebPlayback(props) {
             });
     
     
-            player.connect();
-
+            player.connect() ;
+            //add function toggle play
+            // .then
+            
             player.addListener('player_state_changed', ( state => {
 
                 if (!state) {

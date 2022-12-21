@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 import WebPlayback from './WebPlayback';
+import SearchResults from './SearchResults';
+
 
 function App() {
 
@@ -14,6 +16,7 @@ function App() {
   const [searchKey, setSearchKey] = useState("")
   const [artists, setArtists] = useState([])
   const [albums, setAlbums] = useState([])
+  const [tracks, setTracks] = useState([])
 
   useEffect(() =>{
     const hash = window.location.hash
@@ -64,27 +67,36 @@ function App() {
     })
 
     setAlbums(data.albums.items)
-    console.log(data.albums.items)
   }
 
-  const renderAlbums = () => {
-    return albums.map(album => (
-      <div key={albums.id}>
-        {album.images.length? <img width={"100%"} src={album.images[0].url} alt=""/> : <div>No Image</div>}
-        <a href= {album.uri}>{album.name}</a>
-      </div>
-    ))
+  const searchTracks = async (e) => {
+    e.preventDefault()
+    const {data} = await axios.get("https://api.spotify.com/v1/search", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }, 
+      params: {
+        q: searchKey,
+        type: "track"
+      }
+    })
+
+    setTracks(data.tracks.items)
+    console.log(data.tracks)
   }
-
-
-    const renderArtists = () => {
-      return artists.map(artist => (
-        <div key={artist.id}>
-          {artist.images.length ? <img width={"100%"} src={artist.images[0].url} alt="" /> : <div>No Image</div>}
-          {artist.name}
-        </div>
-      ))
-    }
+  
+  /*const togglePlayAlbum = async (e) => {
+    e.preventDefault()
+    const {data} = await axios.get("https://api.spotify.com/v1/me/player/play", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }, 
+      context: {
+        context_uri: "uri"
+      }
+    })
+  }  */
 
   return (
     <div className= "App">
@@ -99,25 +111,30 @@ function App() {
          {token ?
         <>
           <form onSubmit={searchArtists}>
-            <span>Search Artists: </span>
-            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+            <span>Artists: </span>
+            <input type="text" onChange={e => setSearchKey(e.target.value)}/>
             <button type={"submit"}>GO</button>
           </form>
 
           <form onSubmit={searchAlbums}>
-            <span>Search Albums: </span>
-            <input type="text" onChange={e => setSearchKey(e.target.value)} />
+            <span>Albums: </span>
+            <input type="text" onChange={e => setSearchKey(e.target.value)}/>
             <button type={"submit"}>GO</button>
           </form>
-          <WebPlayback token={token} />
+
+          <form onSubmit={searchTracks}>
+            <span>Songs: </span>
+            <input type="text" onChange={e => setSearchKey(e.target.value)}/>
+            <button type={"submit"}>GO</button>
+          </form>
+
+          <SearchResults tracks={tracks} albums={albums} artists={artists}/>
+
+          <WebPlayback token={token} uri={albums.uri}/>
          </>
          : <h2>Please login</h2>
-         }
-        
-        {renderAlbums()}
-        
-        {renderArtists()}
-        
+         }        
+                              
     </div>
   </div>
   );
