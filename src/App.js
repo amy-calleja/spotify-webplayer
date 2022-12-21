@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
-import WebPlayback from './WebPlayback';
+import Player from './Player';
 import SearchResults from './SearchResults';
+
 
 
 function App() {
@@ -11,12 +12,18 @@ function App() {
   const REDIRECT_URI = "http://localhost:3000"
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize"
   const RESPONSE_TYPE = "token"
-
+              
   const [ token, setToken] = useState("")
   const [searchKey, setSearchKey] = useState("")
   const [artists, setArtists] = useState([])
   const [albums, setAlbums] = useState([])
   const [tracks, setTracks] = useState([])
+  const [playingTrack, setPlayingTrack] = useState()
+
+  function chooseTrack(){
+    setPlayingTrack(tracks)
+    setSearchKey('')
+  }
 
   useEffect(() =>{
     const hash = window.location.hash
@@ -73,11 +80,14 @@ function App() {
     e.preventDefault()
     const {data} = await axios.get("https://api.spotify.com/v1/search", {
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        "Content-Type": 'application/json'
+        
       }, 
       params: {
         q: searchKey,
-        type: "track"
+        type: "track",
+       
       }
     })
 
@@ -103,7 +113,7 @@ function App() {
       <div className="App-header">
         
         {!token ? 
-        <a href= {`${AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}`}>Login to Spotify</a>
+        <a href= {`${AUTH_ENDPOINT}?client_id=${SPOTIFY_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state`}>Login to Spotify</a>
          : <button onClick={logout}>Logout</button>}
 
       <h1>Spotify App</h1>
@@ -127,10 +137,12 @@ function App() {
             <input type="text" onChange={e => setSearchKey(e.target.value)}/>
             <button type={"submit"}>GO</button>
           </form>
+          <br />
+          <Player token={token} trackUri={playingTrack?.uri}/>
+          
 
-          <SearchResults tracks={tracks} albums={albums} artists={artists}/>
+          <SearchResults tracks={tracks} albums={albums} artists={artists} chooseTrack={chooseTrack}/>
 
-          <WebPlayback token={token} uri={albums.uri}/>
          </>
          : <h2>Please login</h2>
          }        

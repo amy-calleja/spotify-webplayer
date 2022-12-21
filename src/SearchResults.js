@@ -1,15 +1,15 @@
 import React from 'react'
 
 
-export default function SearchResults(props) {
-
-    let tracks = props.tracks;
-    let albums = props.albums;
-    let artists = props.artists;
+export default function SearchResults({ tracks, albums, artists, chooseTrack}) {
     
+    function handlePlay() {
+        chooseTrack(tracks)
+    }
+
     const renderTracks = () => {
         return tracks.map(track => (
-          <div key={tracks.id}>
+          <div key={tracks.id} onClick={handlePlay}>
             <br />
             {track.name} - {track.artists[0].name}
             {track.album.images.length? <img width={"100%"} src={track.album.images[0].url} alt=""/> : <div>No Image</div>}
