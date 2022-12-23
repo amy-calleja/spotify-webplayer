@@ -2,14 +2,15 @@ import React from 'react'
 
 
 export default function SearchResults({ tracks, albums, artists, chooseTrack}) {
-    
+   
     function handlePlay() {
-        chooseTrack(tracks)
+        chooseTrack(tracks[0].uri)
+        console.log(tracks[0].uri)
     }
 
     const renderTracks = () => {
         return tracks.map(track => (
-          <div key={tracks.id} onClick={handlePlay}>
+          <div key={tracks.id} onClick={handlePlay} style= {{ cursor: "pointer" }}>
             <br />
             {track.name} - {track.artists[0].name}
             {track.album.images.length? <img width={"100%"} src={track.album.images[0].url} alt=""/> : <div>No Image</div>}

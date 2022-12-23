@@ -6,6 +6,7 @@ import SearchResults from './SearchResults';
 
 
 
+
 function App() {
 
   const SPOTIFY_CLIENT_ID = "69897710f2d0434abc037aaeaf3713fe"
@@ -20,10 +21,12 @@ function App() {
   const [tracks, setTracks] = useState([])
   const [playingTrack, setPlayingTrack] = useState()
 
-  function chooseTrack(){
-    setPlayingTrack(tracks)
+  function chooseTrack(tracks){
+    setPlayingTrack(tracks[0].uri)
     setSearchKey('')
+    console.log(playingTrack)
   }
+
 
   useEffect(() =>{
     const hash = window.location.hash
@@ -82,7 +85,6 @@ function App() {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": 'application/json'
-        
       }, 
       params: {
         q: searchKey,
@@ -92,22 +94,9 @@ function App() {
     })
 
     setTracks(data.tracks.items)
-    console.log(data.tracks)
+    console.log(data.tracks.items)
   }
   
-  /*const togglePlayAlbum = async (e) => {
-    e.preventDefault()
-    const {data} = await axios.get("https://api.spotify.com/v1/me/player/play", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }, 
-      context: {
-        context_uri: "uri"
-      }
-    })
-  }  */
-
   return (
     <div className= "App">
       <div className="App-header">
@@ -138,10 +127,10 @@ function App() {
             <button type={"submit"}>GO</button>
           </form>
           <br />
-          <Player token={token} trackUri={playingTrack?.uri}/>
+          <Player token={token} trackUri={playingTrack} />
           
 
-          <SearchResults tracks={tracks} albums={albums} artists={artists} chooseTrack={chooseTrack}/>
+          <SearchResults  tracks={tracks} albums={albums} artists={artists} chooseTrack={chooseTrack}/>
 
          </>
          : <h2>Please login</h2>
